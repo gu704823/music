@@ -8,67 +8,71 @@
 
 import UIKit
 import SwiftyJSON
-class ViewController: UIViewController {
+import Kingfisher
+class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
     @IBOutlet weak var fengmian: roundimage!
     @IBOutlet weak var beijing: UIImageView!
     @IBOutlet weak var musiclist: UITableView!
 
-    var channeldatas:[JSON]?
-    var tabledata:[JSON]?
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-       
-    //设置ui
-      setupui()
-    }
     //懒加载数据模型
     fileprivate lazy var viewvm:httpmodel = httpmodel()
-}
-//处理ui,数据
-extension ViewController{
-    fileprivate func setupui(){
-      //封面转起来
-        fengmian.onrotation()
-     //背景模糊
-       let blureffect = UIBlurEffect(style: .light)
-       let blurview = UIVisualEffectView(effect: blureffect)
-        blurview.frame.size = CGSize(width: view.frame.width, height: view.frame.height)
-        beijing.addSubview(blurview)
-    //数据源代理
-        musiclist.delegate = self
-        musiclist.dataSource = self
-    //加载数据
+ 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        //设置ui
+        setupui()
+        //加载数据
         loaddata()
-       
-        
-        
     }
 }
-//遵守tableview数据源协议
-extension ViewController:UITableViewDelegate,UITableViewDataSource{
+    extension ViewController{
+        fileprivate func setupui(){
+            ////封面转起来
+            fengmian.onrotation()
+            //背景模糊
+            let blureffect = UIBlurEffect(style: .light)
+            let blurview = UIVisualEffectView(effect: blureffect)
+            blurview.frame.size = CGSize(width: view.frame.width, height: view.frame.height)
+            beijing.addSubview(blurview)
+            //数据源代理
+            musiclist.delegate = self
+            musiclist.dataSource = self
+        }
+    }
+//数据源代理
+extension ViewController{
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
+    }
     //行数
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return viewvm.songgroups.count
     }
     //内容
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = musiclist.dequeueReusableCell(withIdentifier: "musiclist", for: indexPath)
-        cell.textLabel?.text = "歌曲\(indexPath.item)"
-        cell.detailTextLabel?.text = "作者\(indexPath.item)"
-        cell.imageView?.image = UIImage(named: "thumb")
-        return cell
+        let songlist = viewvm.songgroups[indexPath.row]
+        let cell = musiclist.dequeueReusableCell(withIdentifier: "musiclist", for: indexPath) as! playlistTableViewCell
+            cell.songlist = songlist
+            return cell
     }
-    
+
 }
-//发送网络请求
+//加载数据
 extension ViewController{
     fileprivate func loaddata(){
-        viewvm.requestdata { (data1) in
-            print(data1)
-            self.channeldatas = data1
+        viewvm.requestdata1 {
+            
+        }
+        viewvm.requestdata2 {
+            self.musiclist.reloadData()
         }
     }
 }
+
+
+
+
+
+
 
 

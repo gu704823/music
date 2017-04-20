@@ -6,6 +6,5 @@ target 'music' do
   use_frameworks!
  pod 'Alamofire'
 pod 'SwiftyJSON'
-
-
+pod 'Kingfisher'
 end
